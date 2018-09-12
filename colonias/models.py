@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-class CodigoPostal(models.Model):
+class cat_codigo_postal(models.Model):
     """
     Clase que define el model de datos para Codigo Postal
     """
@@ -11,18 +11,25 @@ class CodigoPostal(models.Model):
                                          verbose_name="Codigo Postal",
                                          primary_key=True)
 
-    cla_pais = models.ForeignKey('Pais',
+    cla_pais = models.ForeignKey('cat_pais',
                                   on_delete=models.CASCADE)
 
-    cla_estado = models.ForeignKey('Estado',
+    cla_estado = models.ForeignKey('cat_estado',
                                    on_delete=models.CASCADE)
 
-    cla_municipio = models.ForeignKey('Municipio',
+    cla_municipio = models.ForeignKey('cat_municipio',
                                       on_delete=models.CASCADE)
 
-    cla_colonia = models.ManyToManyField('Colonia')
+    #cla_asentamiento = models.ForeignKey('cat_asentamiento',
+    #                                     on_delete=models.CASCADE)
 
-class Pais(models.Model):
+    class Meta:
+        unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio')
+
+    def __str__(self):
+        return self.cla_codigo_postal
+
+class cat_pais(models.Model):
     cla_pais = models.IntegerField(verbose_name='Clave Pais',
                                    primary_key=True)
 
@@ -32,44 +39,73 @@ class Pais(models.Model):
     def __str__(self):
         return self.nom_pais
 
-class Estado(models.Model):
-    cla_pais = models.ForeignKey('Pais',
+class cat_estado(models.Model):
+    cla_pais = models.ForeignKey('cat_pais',
                                  on_delete=models.CASCADE)
 
-    cla_estado = models.IntegerField(verbose_name='Clave Estado',
-                                     primary_key=True)
+    cla_estado = models.IntegerField(verbose_name='Clave Estado')
 
     nom_estado = models.CharField(max_length=200,
                                   verbose_name='Nombre Estado')
 
+    class Meta:
+        unique_together = ('cla_pais', 'cla_estado')
+
     def __str__(self):
         return self.nom_estado
 
-class Municipio(models.Model):
-    cla_estado = models.ForeignKey('Estado',
+class cat_municipio(models.Model):
+    cla_pais = models.ForeignKey('cat_pais',
+                                 on_delete=models.CASCADE)
+
+    cla_estado = models.ForeignKey('cat_estado',
                                    on_delete=models.CASCADE)
 
-    cla_municipio = models.IntegerField(verbose_name='Clave Municipio',
-                                        primary_key=True)
+    cla_municipio = models.IntegerField(verbose_name='Clave Municipio')
 
     nom_municipio = models.CharField(max_length=200,
                                      verbose_name='Nombre Municipio')
 
+    class Meta:
+        unique_together = ('cla_pais', 'cla_estado', 'cla_municipio')
+
     def __str__(self):
         return self.nom_municipio
 
-class Colonia(models.Model):
-    cla_codigo_postal = models.ForeignKey('CodigoPostal',
+class cat_asentamiento(models.Model):
+    cla_codigo_postal = models.ForeignKey('cat_codigo_postal',
                                           on_delete=models.CASCADE)
 
-    cla_municipio = models.ForeignKey('Municipio',
+    cla_pais = models.ForeignKey('cat_pais',
+                                 on_delete=models.CASCADE)
+
+    cla_estado = models.ForeignKey('cat_estado',
+                                   on_delete=models.CASCADE)
+
+    cla_municipio = models.ForeignKey('cat_municipio',
                                       on_delete=models.CASCADE)
 
-    cla_colonia = models.IntegerField(verbose_name='Clave Colonia',
-                                      primary_key=True)
+    cla_tipo_asentamiento = models.ForeignKey('cat_tipo_asentamiento',
+                                              on_delete=models.CASCADE)
 
-    nom_colonia = models.CharField(max_length=200,
+    cla_asentamiento = models.IntegerField(verbose_name='Clave Asentamiento')
+
+    nom_asentamiento = models.CharField(max_length=200,
                                    verbose_name='Nombre Colonia')
 
+    class Meta:
+        unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
+
     def __str__(self):
-        return self.nom_colonia
+        return self.nom_asentamiento
+
+class cat_tipo_asentamiento(models.Model):
+    cla_tipo_asentamiento = models.IntegerField(verbose_name='Clave Tipo Asentamiento',
+                                                primary_key=True)
+
+    nom_tipo_asentimiento = models.CharField(verbose_name='Nombre Tipo Asentamiento',
+                                             max_length=200)
+
+    def __str__(self):
+        return self.nom_tipo_asentamiento
+
