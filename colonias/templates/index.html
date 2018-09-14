@@ -1,0 +1,17 @@
+{% extends "base_general.html" %}
+
+{% block contenido %}
+    <h1> Prueba </h1>
+
+    <p>Texto de <em>prueba</em> Django<p>
+
+    <h2>Contenido dinamico<h2>
+
+    <ul>
+        <li>Codigos Postales: {{ num_codigos_postales }}</li>
+        <li>Paises: {{ num_paises }}</li>
+        <li>Estados: {{num_estados }}</li>
+        <li>Municipios: {{ num_municipios }}</li>
+        <li>Colonias: {{ num_asentamientos}}</li>
+    </ul>
+{% endblock %}

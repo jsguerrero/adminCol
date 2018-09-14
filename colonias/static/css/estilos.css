@@ -1,0 +1,16 @@
+html, body{
+    overflow-x: hidden;
+}
+
+.navbar-dark .navbar-brand{
+    color: #FFFFFF;
+}
+
+.navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .navlink.show, .navbar-dark .navbar-nav .show>.nav-link{
+    color: #BFBFBF;
+}
+
+.navbar-dark .navbar-nav .nav-link{
+    color: #FFFFFF;
+}
