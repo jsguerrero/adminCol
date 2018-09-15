@@ -29,3 +29,8 @@ from django.views.generic import RedirectView
 urlpatterns += [
     path('', RedirectView.as_view(url='/colonias/', permanent=True)),
 ]
+
+from django.views.generic.base import TemplateView
+urlpatterns += [
+    path('usuarios/', include('django.contrib.auth.urls')),
+]

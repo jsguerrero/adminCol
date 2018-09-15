@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 
-    {% block titulo %}<title>adminCol</title>{% endblock %}
+    <title>{% block titulo %} {% endblock %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
@@ -29,11 +29,16 @@
                 <li class="nav-item"><a class="nav-link" href="">Avisos</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"> {{ user.nom_usuario }} </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            {% else %}
                 <!--<li class="nav-item pt-1"><button type="button" class="btn btn-secondary mr-sm-2">Iniciar Sesion</button></li>
                 <li class="nav-item pt-1"><button type="button" class="btn btn-secondary mr-sm-2">Registrarse</button></li>-->
-                <li class="nav-item"><a class="nav-link" href="">Iniciar Sesion</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a></li>
                 <li class="nav-item"><a class="nav-link" href="">Resgistrarse</a></li>
             </ul>
+            {% endif %}
             {% endblock %}
         </div>
     </nav>

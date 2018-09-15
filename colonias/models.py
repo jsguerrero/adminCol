@@ -109,3 +109,97 @@ class cat_tipo_asentamiento(models.Model):
     def __str__(self):
         return self.nom_tipo_asentamiento
 
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils.translation import ugettext_lazy as _
+
+class cat_usuario_manager(BaseUserManager):
+    """"
+    Modelo para manejar modelo User sin usar el campo username
+    """
+
+    use_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Crear y guardar usuario con correo y contrasena
+        """
+        if not email:
+            raise ValueError('Es necesario el correo electrónico')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Crear y guardar usuario regular con correo y contrasena
+        """
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+
+        return self.create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Crear y guardar un Super usuario con correo y contrasena
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('El super usuario debe tener is_staff=True')
+
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('El super usuario debe tener is_superuser=True')
+
+        return self._create_user(email, password, **extra_fields)
+
+class cat_usuario(AbstractUser):
+    username = None
+
+    email = models.EmailField(_('Correo electrónico'),
+                              unique=True)
+
+    nom_usuario = models.CharField(verbose_name='Nombre(s)',
+                                   max_length=200)
+
+    apellido_paterno = models.CharField(verbose_name='Apellido Paterno',
+                                        max_length=200)
+
+    apellido_materno = models.CharField(verbose_name='Apellido Materno',
+                                        max_length=200)
+
+    es_admin = models.BooleanField(verbose_name='Administrador',
+                                   default=False)
+
+    es_guardia = models.BooleanField(verbose_name='Guardia',
+                                     default=False)
+
+    cla_asentamiento = models.ManyToManyField('cat_direccion_usuario',
+                                              verbose_name='Colonias a las que pertenece')
+
+    USERNAME_FIELD = 'email'
+
+    REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno', 'apellido_materno']
+
+    objects = cat_usuario_manager()
+
+class cat_direccion_usuario(models.Model):
+    cla_usuario = models.ForeignKey('cat_usuario',
+                                    verbose_name='Clave Usuario',
+                                    on_delete=models.CASCADE)
+
+    cla_asentamiento = models.IntegerField(verbose_name='Clave Asentamiento')
+
+    nom_calle = models.CharField(verbose_name='Calle',
+                                 max_length=200)
+
+    numero_ext = models.IntegerField(verbose_name='Numero Exterior')
+
+    numero_int = models.CharField(verbose_name='Interior',
+                                  blank=True,
+                                  max_length=200)
+
