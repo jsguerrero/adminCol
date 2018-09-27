@@ -14,8 +14,8 @@ admin.site.register(cat_asentamiento)
 admin.site.register(cat_tipo_asentamiento)
 admin.site.register(cat_direccion_usuario)
 
+from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
-#from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 class cat_usuarioAdmin(UserAdmin):
     class Meta:
@@ -63,4 +63,5 @@ class cat_usuarioAdmin(UserAdmin):
 
     ordering = ('email',)
 
+admin.site.unregister(Group)
 admin.site.register(cat_usuario, cat_usuarioAdmin)

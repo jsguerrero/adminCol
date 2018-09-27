@@ -1,14 +1,15 @@
 {% extends "base_general.html" %}
 
-<!--{% block titulo %} Iniciar Sesion {% endblock %}-->
+{% block titulo %} Iniciar Sesión {% endblock %}
 
 {% block contenido %}
 
-<h2>Login</h2>
-<form method="post">
+<h2>Iniciar Sesión</h2>
+<form class="needs-validation" method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit"><Login</button>
+    <!--{{ form.as_p }}-->
+    {% include 'formulario.html' with form=form %}
+    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
 </form>
 
 {% endblock %}

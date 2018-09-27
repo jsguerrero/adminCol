@@ -1,0 +1,6 @@
+<option value="">Seleccionar Colonia</option>
+{% for asentamiento in asentamientos %}
+<option value="{{ asentamiento.cla_asentamiento }}">{{ asentamiento.descripcion_asentamiento }}</option>
+{% endfor %}
+
+

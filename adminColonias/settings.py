@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'colonias.apps.ColoniasConfig',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,4 @@ AUTH_USER_MODEL = 'colonias.cat_usuario'
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
+

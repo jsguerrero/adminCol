@@ -103,7 +103,7 @@ class cat_tipo_asentamiento(models.Model):
     cla_tipo_asentamiento = models.IntegerField(verbose_name='Clave Tipo Asentamiento',
                                                 primary_key=True)
 
-    nom_tipo_asentimiento = models.CharField(verbose_name='Nombre Tipo Asentamiento',
+    nom_tipo_asentamiento = models.CharField(verbose_name='Nombre Tipo Asentamiento',
                                              max_length=200)
 
     def __str__(self):
@@ -170,7 +170,8 @@ class cat_usuario(AbstractUser):
                                         max_length=200)
 
     apellido_materno = models.CharField(verbose_name='Apellido Materno',
-                                        max_length=200)
+                                        max_length=200,
+                                        null=True)
 
     es_admin = models.BooleanField(verbose_name='Administrador',
                                    default=False)
@@ -186,6 +187,19 @@ class cat_usuario(AbstractUser):
     REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno', 'apellido_materno']
 
     objects = cat_usuario_manager()
+
+    def get_es_guardia(self):
+        perfil_guardia = None
+        if hasattr(self, 'perfil_guardia'):
+            perfil_guardia = self.perfil_guardia
+        return perfil_guardia
+
+    def get_es_admin(self):
+        perfil_admin = None
+        if hasattr(self, 'perfil_admin'):
+            perfil_admin = self.perfil_admin
+        return perfil_admin
+
 
 class cat_direccion_usuario(models.Model):
     cla_usuario = models.ForeignKey('cat_usuario',
@@ -203,3 +217,20 @@ class cat_direccion_usuario(models.Model):
                                   blank=True,
                                   max_length=200)
 
+class perfil_guardia(models.Model):
+    cla_usuario = models.OneToOneField('cat_usuario',
+                                   on_delete=models.CASCADE)
+
+    cla_asentamiento = models.OneToOneField('cat_asentamiento',
+                                            on_delete=models.CASCADE)
+
+    activo = models.BooleanField(default=True)
+
+class perfil_admin(models.Model):
+    cla_usuario = models.OneToOneField('cat_usuario',
+                                   on_delete=models.CASCADE)
+
+    cla_asentamiento = models.OneToOneField('cat_asentamiento',
+                                            on_delete=models.CASCADE)
+
+    activo = models.BooleanField(default=True)
