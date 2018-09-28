@@ -141,6 +141,11 @@ class cat_usuario_manager(BaseUserManager):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
 
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+
         return self.create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -205,13 +210,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 class cat_direccion_usuario(models.Model):
-    content_type = models.ForeignKey(ContentType,
-                                     on_delete=models.CASCADE,
-                                     related_name='content_type_direccion')
+    cla_usuario = models.ForeignKey('cat_usuario',
+                                     on_delete=models.CASCADE)
 
-    object_id = models.PositiveIntegerField()
-
-    content_object = GenericForeignKey('content_type', 'object_id')
+    cla_asentamiento = models.ForeignKey('cat_asentamiento',
+                                         on_delete=models.CASCADE)
 
     #cla_usuario = models.ForeignKey('cat_usuario',
     #                                verbose_name='Clave Usuario',

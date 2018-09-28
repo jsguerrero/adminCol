@@ -16,4 +16,4 @@
 \copy colonias_cat_tipo_asentamiento FROM 'datosCP/cattipoasentamiento.csv' DELIMITERS ',' CSV;
 
 \echo colonias_cat_asentamiento
-\copy colonias_cat_asentamiento FROM 'datosCP/catasentamiento.csv' DELIMITERS ',' CSV;
+\copy colonias_cat_asentamiento FROM 'datosCP/catasentamiento2.csv' DELIMITERS ',' CSV;

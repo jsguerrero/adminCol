@@ -10,7 +10,8 @@
 <h2>Registro</h2>
 <form class="needs-validation" id="formulario_registro" method="POST" url_datos_colonias="{% url 'ajax_cargar_colonias' %}" autocomplete="off" >
   {% csrf_token %}
-  {% include 'formulario.html' with form=form %}
+  {% include 'formulario.html' with form=form_usuario %}
+  {% include 'formulario.html' with form=form_direccion %}
   <button type="submit" class="btn btn-primary">Registrarse</button>
 </form>
 
@@ -26,7 +27,7 @@ type:'get',
             'codigo_postal': codigo_postal // add the country id to the GET parameters
         },
         success: function (data) {   // `data` is the return of the `load_cities` view function
-            $("#id_colonia").html(data);  // replace the contents of the city input with the data that came from the server
+            $("#id_cla_asentamiento").html(data);  // replace the contents of the city input with the data that came from the server
         }
     });
 

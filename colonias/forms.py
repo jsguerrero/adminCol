@@ -1,68 +1,112 @@
 #from django.contrib.auth.forms import UserCreationForm
-#from .models import cat_usuario
-from django import forms
+from django.forms import ModelForm, CharField, TextInput, PasswordInput, IntegerField, ChoiceField, Select
+from .models import cat_usuario
+#from django import forms
 
-class formulario_registro(forms.Form):
+class formulario_usuario(ModelForm):
 
-    nombre = forms.CharField(max_length=50,
-                             label='Nombre',
-                             required=True,
-                             widget=forms.TextInput(
-                                 attrs={
-                                     'placeholder':'Nombre(s)'
-                                 }))
+    class Meta:
+        model = cat_usuario
+        fields = ['email', 'contrasena1', 'contrasena2', 'nom_usuario', 'apellido_paterno', 'apellido_materno']
+        widgets = {'email':TextInput(attrs={'placeholder':'Correo electrónico'}),
+                   'nom_usuario':TextInput(attrs={'placeholder':'Nombre(s)'}),
+                   'apellido_paterno':TextInput(attrs={'placeholder':'Apellido Paterno'}),
+        }
 
-    apellido_paterno = forms.CharField(max_length=50,
-                                       label='Apellido Paterno',
-                                       required=True,
-                                       widget=forms.TextInput(
-                                           attrs={
-                                               'placeholder':'Apellido Paterno'
-                                           }))
+    contrasena1 = CharField(required=True,
+                                  label='Contraseña',
+                                  help_text='Mínimo 8 caracteres con mayúscula, minúscula y número o caracter especial',
+                                  widget=PasswordInput(
+                                      attrs={'id':'contrasena1',
+                                             'placeholder':'Contraseña',
+                                             'pattern':'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'
+                                      }))
 
-    apellido_materno = forms.CharField(max_length=50,
+    contrasena2 = CharField(required=True,
+                                  label='Confirmar contraseña',
+                                  help_text='Mínimo 8 caracteres con mayúscula, minúscula y número o caracter especial',
+                                  widget=PasswordInput(
+                                      attrs={
+                                          'placeholder':'Confirmar contraseña',
+                                          'pattern':'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'
+                                      }))
+
+    apellido_materno = CharField(max_length=50,
                                        label='Apellido Materno',
                                        required=False,
-                                       widget=forms.TextInput(
-                                           attrs={
-                                               'placeholder':'Apellido Materno'
-                                           }))
+                                       widget=TextInput(
+                                           attrs={'placeholder':'Apellido Materno'}))
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.set_password(self.cleaned_data["contrasena1"])
+        if commit:
+            usuario.save()
+        return usuario
 
-    codigo_postal = forms.IntegerField(label='Código Postal',
+'''    def clean(self):
+        datos = super().clean()
+        correo_electronico = datos.get("correo_electronico")
+        contrasena1 = datos.get("contrasena1")
+        contrasena2 = datos.get("contrasena2")
+        estado = datos.get("estado")
+        colonia = datos.get("colonia")
+        if correo_electronico or not contrasena1 or not contrasena2 or not estado:
+            raise forms.ValidationError('Faltan datos necesarios')
+        if colonia == 'Prueba':
+            raise forms.ValidationError('Las contraseñas no coinciden')
+
+    def guardar(self, commit=True):
+        usuario = super(formulario_registro, self).guardar(commit=False)
+        usuario.email = self.cleaned_data['email']
+
+        if commit:
+            user.guardar()
+
+        return usuario
+'''
+
+from .models import cat_direccion_usuario, cat_asentamiento
+class formulario_direccion(ModelForm):
+
+    class Meta:
+        model = cat_direccion_usuario
+        fields = ['codigo_postal', 'cla_asentamiento', 'nom_calle', 'num_exterior', 'num_interior']
+        widgets = {'nom_calle':TextInput(attrs={'placeholder':'Calle'}),
+                   'num_exterior':TextInput(attrs={'placeholder':'Número Exterior'}),
+                   'num_interior':TextInput(attrs={'placeholder':'Número Interior'}),
+        #           'apellido_materno':TextInput(attrs={'placeholder':'Apellido Materno'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(formulario_direccion, self).__init__(*args, **kwargs)
+        self.fields['cla_asentamiento'].queryset = cat_asentamiento.objects.all()[0]
+
+    codigo_postal = IntegerField(label='Código Postal',
                                        required=True,
-                                       widget=forms.TextInput(
+                                       widget=TextInput(
                                            attrs={
                                                'placeholder':'Código Postal',
                                                'onfocusout':'validar_codigo_postal(this)',
                                                'pattern':'(\d{5}?)'
                                            }))
 
-    '''estado = forms.CharField(max_length=50,
-                             label='Estado',
-                             required=True,
-                             widget=forms.TextInput(
-                                 attrs={
-                                     'placeholder':'Estado',
-                                     'readonly':'True'
-                                 }))
-
-    municipio = forms.CharField(max_length=50,
-                             label='Municipio',
-                             required=True,
-                             widget=forms.TextInput(
-                                 attrs={
-                                     'placeholder':'Municipio',
-                                     'readonly':'True'
-                                 }))'''
-
-    colonia = forms.ChoiceField(label='Colonia',
+    cla_asentamiento = ChoiceField(label='Colonia',
                                 required=True,
-                                widget=forms.Select(
+                                widget=Select(
                                  attrs={
                                      'required':' True'
                                  }))
 
-    calle = forms.CharField(max_length=50,
+    def save(self, commit=True):
+        direccion = super().save(commit=False)
+        cla_asentamiento_sel = self.cleaned_data["cla_asentamiento"]
+        cla_asentamiento = cat_asentamiento.objects.filter(id=cla_asentamiento_sel)
+        direccion.set_cla_asentamiento(cla_asentamiento)
+        if commit:
+            direccion.save()
+        return direccion
+
+    '''calle = forms.CharField(max_length=50,
                             label='Calle',
                             required=True,
                             widget=forms.TextInput(
@@ -83,66 +127,4 @@ class formulario_registro(forms.Form):
                                 attrs={'placeholder':'Número interior'
                                 }))
 
-    correo_electronico1 = forms.EmailField(max_length=100,
-                             label='Correo electrónico',
-                             required=True,
-                             help_text="Correo electrónico",
-                             widget=forms.EmailInput(
-                                 attrs={
-                                     'placeholder':'Correo electrónico'
-                                 }))
-
-    #correo_electronico2 = forms.EmailField(max_length=100,
-    #                         label='Confirmar correo electrónico',
-    #                         required=True,
-    #                         help_text="Correo correo electrónico",
-    #                         widget=forms.EmailInput(
-    #                             attrs={
-    #                                 'placeholder':'Confirmar correo electrónico',
-    #                                 'required': 'True'
-    #                             }))
-
-    contrasena1 = forms.CharField(required=True,
-                                  label='Contraseña',
-                                  help_text='Mínimo 8 caracteres con mayúscula, minúscula y número o caracter especial',
-                                  widget=forms.PasswordInput(
-                                      attrs={'id':'contrasena1',
-                                             'placeholder':'Contraseña',
-                                             'pattern':'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'
-                                      }))
-
-    contrasena2 = forms.CharField(required=True,
-                                  label='Confirmar contraseña',
-                                  help_text='Mínimo 8 caracteres con mayúscula, minúscula y número o caracter especial',
-                                  widget=forms.PasswordInput(
-                                      attrs={
-                                          'placeholder':'Confirmar contraseña',
-                                          'pattern':'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-                                          'oninput':'validar_contrasena(this)'
-                                      }))
-
-
-    #class Meta:
-    #    model = cat_usuario
-    #    fields = {'email', 'password1', 'password2'}
-
-    def clean(self):
-        datos = super().clean()
-        correo_electronico = datos.get("correo_electronico")
-        contrasena1 = datos.get("contrasena1")
-        contrasena2 = datos.get("contrasena2")
-        estado = datos.get("estado")
-        colonia = datos.get("colonia")
-        if correo_electronico or not contrasena1 or not contrasena2 or not estado:
-            raise forms.ValidationError('Faltan datos necesarios')
-        if colonia == 'Prueba':
-            raise forms.ValidationError('Las contraseñas no coinciden')
-
-    def guardar(self, commit=True):
-        usuario = super(formulario_registro, self).guardar(commit=False)
-        usuario.email = self.cleaned_data['email']
-
-        if commit:
-            user.guardar()
-
-        return usuario
+'''

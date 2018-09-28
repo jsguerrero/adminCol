@@ -30,17 +30,26 @@ def index(request):
 from django.http import HttpResponseRedirect
 #from django.contrib.auth.forms import UserCreationForm
 from django.template.context_processors import csrf
-from .forms import formulario_registro
+from .forms import formulario_usuario, formulario_direccion
 
 def registro(request):
     if request.method == 'POST':
-        form = formulario_registro(request.POST)
-        if form.is_valid():
-            pass
-            #form.save()
+        form_usuario = formulario_usuario(request.POST)
+        form_direccion = formulario_direccion(request.POST)
+        col = request.POST.get('cla_asentamiento')
+        form_direccion.fields['cla_asentamiento'].choices = [(col, col)]
+        if form_usuario.is_valid() and form_direccion.is_valid():
+            usuario = form_usuario.save(commit=False)
+            form_direccion.fields['cla_usuario'] = usuario
+            print(form_direccion.fields['cla_asentamiento'])
+            #form_direccion.save()
             return HttpResponseRedirect('/usuarios/login')
+        else:
+            print (form_usuario.errors)
+            print (form_direccion.errors)
     else:
-        form = formulario_registro()
+        form_usuario = formulario_usuario()
+        form_direccion = formulario_direccion()
 
     #context = {}
     #context.update(csrf(request))
@@ -48,7 +57,8 @@ def registro(request):
 
     #context={'form':formulario_registro()
     #}
-    context={'form':form
+    context={'form_usuario':form_usuario,
+        'form_direccion':form_direccion
     }
 
     context.update(csrf(request))
