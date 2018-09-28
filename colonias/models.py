@@ -76,14 +76,14 @@ class cat_asentamiento(models.Model):
     cla_codigo_postal = models.ForeignKey('cat_codigo_postal',
                                           on_delete=models.CASCADE)
 
-    cla_pais = models.ForeignKey('cat_pais',
-                                 on_delete=models.CASCADE)
+    #cla_pais = models.ForeignKey('cat_pais',
+    #                             on_delete=models.CASCADE)
 
-    cla_estado = models.ForeignKey('cat_estado',
-                                   on_delete=models.CASCADE)
+    #cla_estado = models.ForeignKey('cat_estado',
+    #                               on_delete=models.CASCADE)
 
-    cla_municipio = models.ForeignKey('cat_municipio',
-                                      on_delete=models.CASCADE)
+    #cla_municipio = models.ForeignKey('cat_municipio',
+    #                                  on_delete=models.CASCADE)
 
     cla_tipo_asentamiento = models.ForeignKey('cat_tipo_asentamiento',
                                               on_delete=models.CASCADE)
@@ -94,7 +94,8 @@ class cat_asentamiento(models.Model):
                                    verbose_name='Nombre Colonia')
 
     class Meta:
-        unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
+        #unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
+        unique_together = ('cla_codigo_postal', 'cla_asentamiento')
 
     def __str__(self):
         return self.nom_asentamiento
@@ -184,7 +185,7 @@ class cat_usuario(AbstractUser):
 
     USERNAME_FIELD = 'email'
 
-    REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno', 'apellido_materno']
+    REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno']
 
     objects = cat_usuario_manager()
 
@@ -200,20 +201,35 @@ class cat_usuario(AbstractUser):
             perfil_admin = self.perfil_admin
         return perfil_admin
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 class cat_direccion_usuario(models.Model):
-    cla_usuario = models.ForeignKey('cat_usuario',
-                                    verbose_name='Clave Usuario',
-                                    on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType,
+                                     on_delete=models.CASCADE,
+                                     related_name='content_type_direccion')
 
-    cla_asentamiento = models.IntegerField(verbose_name='Clave Asentamiento')
+    object_id = models.PositiveIntegerField()
+
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    #cla_usuario = models.ForeignKey('cat_usuario',
+    #                                verbose_name='Clave Usuario',
+    #                                on_delete=models.CASCADE)
+
+    #cla_codigo_postal= models.ForeignKey('cat_codigo_postal',
+    #                                     on_delete=models.CASCADE)
+
+    #cla_asentamiento = models.ForeignKey('cat_asentamiento',
+    #                                     on_delete=models.CASCADE,
+    #                                     verbose_name='Clave Asentamiento')
 
     nom_calle = models.CharField(verbose_name='Calle',
                                  max_length=200)
 
-    numero_ext = models.IntegerField(verbose_name='Numero Exterior')
+    num_exterior = models.IntegerField(verbose_name='Numero Exterior')
 
-    numero_int = models.CharField(verbose_name='Interior',
+    num_interior = models.CharField(verbose_name='Interior',
                                   blank=True,
                                   max_length=200)
 
