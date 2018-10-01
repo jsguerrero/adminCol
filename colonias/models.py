@@ -93,6 +93,9 @@ class cat_asentamiento(models.Model):
     nom_asentamiento = models.CharField(max_length=200,
                                    verbose_name='Nombre Colonia')
 
+    activo = models.BooleanField(verbose_name='Colonia activa',
+                                 default=False)
+
     class Meta:
         #unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
         unique_together = ('cla_codigo_postal', 'cla_asentamiento')
@@ -215,17 +218,6 @@ class cat_direccion_usuario(models.Model):
 
     cla_asentamiento = models.ForeignKey('cat_asentamiento',
                                          on_delete=models.CASCADE)
-
-    #cla_usuario = models.ForeignKey('cat_usuario',
-    #                                verbose_name='Clave Usuario',
-    #                                on_delete=models.CASCADE)
-
-    #cla_codigo_postal= models.ForeignKey('cat_codigo_postal',
-    #                                     on_delete=models.CASCADE)
-
-    #cla_asentamiento = models.ForeignKey('cat_asentamiento',
-    #                                     on_delete=models.CASCADE,
-    #                                     verbose_name='Clave Asentamiento')
 
     nom_calle = models.CharField(verbose_name='Calle',
                                  max_length=200)

@@ -28,7 +28,6 @@ def index(request):
 
 
 from django.http import HttpResponseRedirect
-#from django.contrib.auth.forms import UserCreationForm
 from django.template.context_processors import csrf
 from .forms import formulario_usuario, formulario_direccion
 
@@ -36,13 +35,18 @@ def registro(request):
     if request.method == 'POST':
         form_usuario = formulario_usuario(request.POST)
         form_direccion = formulario_direccion(request.POST)
-        col = request.POST.get('cla_asentamiento')
-        form_direccion.fields['cla_asentamiento'].choices = [(col, col)]
+        #form_direccion.fields['cla_asentamiento'] = cat_asentamiento.objects.get(id=86104)
+        #form_direccion['cla_asentamiento'] = (86104, cat_asentamiento.objects.get(id=86104))
+        # Falta validar el formulario de la direccion marca error
+        # Select a valid choice. That choice is not one of the available choices.
         if form_usuario.is_valid() and form_direccion.is_valid():
-            usuario = form_usuario.save(commit=False)
-            form_direccion.fields['cla_usuario'] = usuario
-            print(form_direccion.fields['cla_asentamiento'])
-            #form_direccion.save()
+            #usuario = form_usuario.save(commit=False)
+            direccion = form_direccion.save(commit=False)
+            usuario = form_usuario.save()
+            direccion.cla_usuario_id = usuario.id
+            print(direccion)
+            #print(form_direccion.cla_usuario_id)
+            direccion.save()
             return HttpResponseRedirect('/usuarios/login')
         else:
             print (form_usuario.errors)
@@ -51,12 +55,6 @@ def registro(request):
         form_usuario = formulario_usuario()
         form_direccion = formulario_direccion()
 
-    #context = {}
-    #context.update(csrf(request))
-    #context['form'] = formulario_registro()
-
-    #context={'form':formulario_registro()
-    #}
     context={'form_usuario':form_usuario,
         'form_direccion':form_direccion
     }
@@ -65,16 +63,29 @@ def registro(request):
 
     return render(request, 'registration/registro.html', context)
 
-from django.http import HttpResponse
 
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.db.models import Q
 def cargar_colonias(request):
     if request.is_ajax():
         codigo_postal = request.GET.get('codigo_postal')
-        query = "select concat(nom_tipo_asentamiento, ' ', nom_asentamiento) from colonias_cat_tipo_asentamiento where colonias_cat_tipo_asentamiento.cla_tipo_asentamiento = colonias_cat_asentamiento.cla_tipo_asentamiento_id"
-        asentamientos = cat_asentamiento.objects.filter(cla_codigo_postal=codigo_postal).order_by('nom_asentamiento')
-        asentamientos = asentamientos.extra(
-            select={'descripcion_asentamiento':query})
-        #estado = cat_estado.objects.filter(cat_codigo_postal=codigo_postal)
+        #asentamientos = cat_asentamiento.objects.none()
+        #options = '<option value="" selected="selected">Seleccion Colonia</option>'
+        if codigo_postal:
+            criterio1 = Q(cla_codigo_postal=codigo_postal)
+            criterio2 = Q(activo=1)
+            asentamientos = cat_asentamiento.objects.filter(criterio1 & criterio2)
+            query = "select concat(nom_tipo_asentamiento, ' ', nom_asentamiento) from colonias_cat_tipo_asentamiento where colonias_cat_tipo_asentamiento.cla_tipo_asentamiento = colonias_cat_asentamiento.cla_tipo_asentamiento_id"
+            asentamientos = asentamientos.extra(select={'descripcion_asentamiento':query})
+            #for asentamiento in asentamientos:
+            #    options += '<option value="%s">%s</option>' % (
+            #        asentamiento.cla_asentamiento,
+            #        asentamiento.descripcion_asentamiento
+            #    )
+        #response = {}
+        #response['cla_asentamiento'] = options
+        #return JsonResponse(response)
         return render(request, 'asentamientos.html', {'asentamientos': asentamientos})
     else:
         return HttpResponseRedirect('/colonias/registro')
