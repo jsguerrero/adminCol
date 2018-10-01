@@ -25,6 +25,8 @@ class cat_codigo_postal(models.Model):
 
     class Meta:
         unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio')
+        verbose_name = 'Código Postal'
+        verbose_name_plural = 'Códigos Postales'
 
     def __str__(self):
         return self.cla_codigo_postal
@@ -35,6 +37,10 @@ class cat_pais(models.Model):
 
     nom_pais = models.CharField(max_length=200,
                                 verbose_name='Nombre Pais')
+
+    class Meta:
+        verbose_name = 'País'
+        verbose_name_plural = 'Paises'
 
     def __str__(self):
         return self.nom_pais
@@ -50,6 +56,8 @@ class cat_estado(models.Model):
 
     class Meta:
         unique_together = ('cla_pais', 'cla_estado')
+        verbose_name = 'Estado'
+        verbose_name_plural = 'Estados'
 
     def __str__(self):
         return self.nom_estado
@@ -68,12 +76,15 @@ class cat_municipio(models.Model):
 
     class Meta:
         unique_together = ('cla_pais', 'cla_estado', 'cla_municipio')
+        verbose_name = 'Municipio'
+        verbose_name_plural = 'Municipios'
 
     def __str__(self):
         return self.nom_municipio
 
 class cat_asentamiento(models.Model):
     cla_codigo_postal = models.ForeignKey('cat_codigo_postal',
+                                          verbose_name='Código Postal',
                                           on_delete=models.CASCADE)
 
     #cla_pais = models.ForeignKey('cat_pais',
@@ -99,6 +110,8 @@ class cat_asentamiento(models.Model):
     class Meta:
         #unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
         unique_together = ('cla_codigo_postal', 'cla_asentamiento')
+        verbose_name = 'Asentamiento'
+        verbose_name_plural = 'Asentamientos'
 
     def __str__(self):
         return self.nom_asentamiento
@@ -196,6 +209,11 @@ class cat_usuario(AbstractUser):
     REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno']
 
     objects = cat_usuario_manager()
+
+    class Meta:
+        verbose_name = 'Usuario'
+        verbose_name_plural = 'Usuarios'
+
 
     def get_es_guardia(self):
         perfil_guardia = None

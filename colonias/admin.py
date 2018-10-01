@@ -10,7 +10,7 @@ admin.site.register(cat_codigo_postal)
 admin.site.register(cat_pais)
 admin.site.register(cat_estado)
 admin.site.register(cat_municipio)
-admin.site.register(cat_asentamiento)
+#admin.site.register(cat_asentamiento)
 admin.site.register(cat_tipo_asentamiento)
 admin.site.register(cat_direccion_usuario)
 
@@ -65,3 +65,16 @@ class cat_usuarioAdmin(UserAdmin):
 
 admin.site.unregister(Group)
 admin.site.register(cat_usuario, cat_usuarioAdmin)
+
+def activar_asentamientos(modeladmin, request, queryset):
+    queryset.update(activo=1)
+activar_asentamientos.short_description = "Marcar como activos"
+
+class cat_asentamientoAdmin(admin.ModelAdmin):
+    list_display = ('nom_asentamiento', 'cla_codigo_postal','activo')
+
+    search_fields = ['nom_asentamiento', 'cla_codigo_postal__exact']
+
+    actions = [activar_asentamientos]
+
+admin.site.register(cat_asentamiento, cat_asentamientoAdmin)
