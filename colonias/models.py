@@ -182,12 +182,6 @@ class cat_usuario(AbstractUser):
                                         max_length=200,
                                         null=True)
 
-    es_admin = models.BooleanField(verbose_name='Administrador',
-                                   default=False)
-
-    es_guardia = models.BooleanField(verbose_name='Guardia',
-                                     default=False)
-
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno']
@@ -222,10 +216,18 @@ class perfil_usuario(models.Model):
     expiracion_llave = models.DateTimeField(default=timezone.now)
 
 class perfil_vecino(models.Model):
-    cla_usuario = models.OneToOneField('cat_usuario',
+    class Meta:
+        verbose_name = 'Dirección'
+        verbose_name_plural = 'Direcciones'
+
+    cla_usuario = models.ForeignKey('cat_usuario',
                                        on_delete=models.CASCADE)
 
-    cla_asentamiento = models.OneToOneField('cat_asentamiento',
+    cla_codigo_postal = models.ForeignKey('cat_codigo_postal',
+                                          verbose_name='Código Postal',
+                                          on_delete=models.CASCADE)
+
+    cla_asentamiento = models.ForeignKey('cat_asentamiento',
                                             on_delete=models.CASCADE)
 
     nom_calle = models.CharField(verbose_name='Calle',
@@ -238,6 +240,15 @@ class perfil_vecino(models.Model):
                                   max_length=200)
 
     activo = models.BooleanField(default=False)
+
+    es_admin = models.BooleanField(verbose_name='Admin',
+                                   default=False)
+
+    es_guardia = models.BooleanField(verbose_name='Guardia',
+                                     default=False)
+
+    def __str__(self):
+        return self.cla_usuario.nom_usuario + ' ' + self.cla_usuario.apellido_paterno + ' ' + self.cla_usuario.apellido_materno
 
 class perfil_guardia(models.Model):
     cla_direccion = models.OneToOneField('perfil_vecino',
