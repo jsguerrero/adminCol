@@ -22,13 +22,13 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMenu">
-            <a class="navbar-brand" href="/">AdminCol</a>
-            {% block menu %}
+            <a class="navbar-brand" href="{% url 'index' %}">AdminCol</a>
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="">Visitantes</a></li>
                 <li class="nav-item"><a class="nav-link" href="">Áreas Recreativas</a></li>
                 <li class="nav-item"><a class="nav-link" href="">Avisos</a></li>
+                {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
@@ -41,7 +41,6 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
             </ul>
             {% endif %}
-            {% endblock %}
         </div>
     </nav>
 

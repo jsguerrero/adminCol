@@ -20,9 +20,6 @@ class cat_codigo_postal(models.Model):
     cla_municipio = models.ForeignKey('cat_municipio',
                                       on_delete=models.CASCADE)
 
-    #cla_asentamiento = models.ForeignKey('cat_asentamiento',
-    #                                     on_delete=models.CASCADE)
-
     class Meta:
         unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio')
         verbose_name = 'Código Postal'
@@ -87,15 +84,6 @@ class cat_asentamiento(models.Model):
                                           verbose_name='Código Postal',
                                           on_delete=models.CASCADE)
 
-    #cla_pais = models.ForeignKey('cat_pais',
-    #                             on_delete=models.CASCADE)
-
-    #cla_estado = models.ForeignKey('cat_estado',
-    #                               on_delete=models.CASCADE)
-
-    #cla_municipio = models.ForeignKey('cat_municipio',
-    #                                  on_delete=models.CASCADE)
-
     cla_tipo_asentamiento = models.ForeignKey('cat_tipo_asentamiento',
                                               on_delete=models.CASCADE)
 
@@ -108,7 +96,6 @@ class cat_asentamiento(models.Model):
                                  default=False)
 
     class Meta:
-        #unique_together = ('cla_codigo_postal', 'cla_pais', 'cla_estado', 'cla_municipio', 'cla_asentamiento')
         unique_together = ('cla_codigo_postal', 'cla_asentamiento')
         verbose_name = 'Asentamiento'
         verbose_name_plural = 'Asentamientos'
@@ -201,9 +188,6 @@ class cat_usuario(AbstractUser):
     es_guardia = models.BooleanField(verbose_name='Guardia',
                                      default=False)
 
-    cla_asentamiento = models.ManyToManyField('cat_direccion_usuario',
-                                              verbose_name='Colonias a las que pertenece')
-
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['nom_usuario', 'apellido_paterno']
@@ -227,15 +211,22 @@ class cat_usuario(AbstractUser):
             perfil_admin = self.perfil_admin
         return perfil_admin
 
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils import timezone
+class perfil_usuario(models.Model):
+    cla_usuario = models.OneToOneField('cat_usuario',
+                                       on_delete=models.CASCADE)
 
-class cat_direccion_usuario(models.Model):
-    cla_usuario = models.ForeignKey('cat_usuario',
-                                     on_delete=models.CASCADE)
+    llave_activacion = models.CharField(max_length=40,
+                                        blank=True)
 
-    cla_asentamiento = models.ForeignKey('cat_asentamiento',
-                                         on_delete=models.CASCADE)
+    expiracion_llave = models.DateTimeField(default=timezone.now)
+
+class perfil_vecino(models.Model):
+    cla_usuario = models.OneToOneField('cat_usuario',
+                                       on_delete=models.CASCADE)
+
+    cla_asentamiento = models.OneToOneField('cat_asentamiento',
+                                            on_delete=models.CASCADE)
 
     nom_calle = models.CharField(verbose_name='Calle',
                                  max_length=200)
@@ -246,20 +237,16 @@ class cat_direccion_usuario(models.Model):
                                   blank=True,
                                   max_length=200)
 
-class perfil_guardia(models.Model):
-    cla_usuario = models.OneToOneField('cat_usuario',
-                                   on_delete=models.CASCADE)
+    activo = models.BooleanField(default=False)
 
-    cla_asentamiento = models.OneToOneField('cat_asentamiento',
-                                            on_delete=models.CASCADE)
+class perfil_guardia(models.Model):
+    cla_direccion = models.OneToOneField('perfil_vecino',
+                                         on_delete = models.CASCADE)
 
     activo = models.BooleanField(default=True)
 
 class perfil_admin(models.Model):
-    cla_usuario = models.OneToOneField('cat_usuario',
-                                   on_delete=models.CASCADE)
-
-    cla_asentamiento = models.OneToOneField('cat_asentamiento',
-                                            on_delete=models.CASCADE)
+    cla_direccion = models.OneToOneField('perfil_vecino',
+                                         on_delete = models.CASCADE)
 
     activo = models.BooleanField(default=True)

@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from .models import cat_codigo_postal, cat_pais, cat_estado, cat_municipio
 from .models import cat_asentamiento, cat_tipo_asentamiento, cat_usuario
-from .models import cat_direccion_usuario
+#from .models import cat_direccion_usuario
 
 admin.site.register(cat_codigo_postal)
 admin.site.register(cat_pais)
@@ -12,7 +12,7 @@ admin.site.register(cat_estado)
 admin.site.register(cat_municipio)
 #admin.site.register(cat_asentamiento)
 admin.site.register(cat_tipo_asentamiento)
-admin.site.register(cat_direccion_usuario)
+#admin.site.register(cat_direccion_usuario)
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
@@ -70,11 +70,15 @@ def activar_asentamientos(modeladmin, request, queryset):
     queryset.update(activo=1)
 activar_asentamientos.short_description = "Marcar como activos"
 
+def desactivar_asentamientos(modeladmin, request, queryset):
+    queryset.update(activo=0)
+desactivar_asentamientos.short_description = "Marcar como no activos"
+
 class cat_asentamientoAdmin(admin.ModelAdmin):
     list_display = ('nom_asentamiento', 'cla_codigo_postal','activo')
 
     search_fields = ['nom_asentamiento', 'cla_codigo_postal__exact']
 
-    actions = [activar_asentamientos]
+    actions = [activar_asentamientos, desactivar_asentamientos]
 
 admin.site.register(cat_asentamiento, cat_asentamientoAdmin)

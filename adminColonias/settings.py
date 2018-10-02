@@ -139,3 +139,14 @@ LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
 
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = 'sg@resepa.com'
+
+EMAIL_HOST_PASSWORD = 'vidociela1226'
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'sg@resepa.com'
