@@ -120,3 +120,23 @@ def activacion_cuenta(request, llave_activacion):
 def necesita_validacion(request):
     return render(request, 'registration/necesita_validacion.html')
 
+
+from .forms import formulario_editar_usuario, formulario_direcciones_usuario
+from .models import perfil_vecino
+from django.forms import inlineformset_factory
+def editar_usuario(request):
+    usuario = cat_usuario.objects.get(id=request.user.id)
+    direcciones_formset = inlineformset_factory(cat_usuario,
+                                                perfil_vecino,
+                                                form=formulario_direcciones_usuario,
+                                                extra=1)
+    #if form_usuario.is_valid():
+    #    return render(request, 'registration/necesita_validacion.html', context)
+    form_usuario = formulario_editar_usuario(instance=usuario)
+    formset = direcciones_formset(instance=usuario)
+    context={'formset': formset,'form':form_usuario
+    }
+
+    context.update(csrf(request))
+
+    return render(request, 'registration/editar_usuario.html', context)

@@ -91,3 +91,43 @@ class formulario_direccion(ModelForm):
         elif self.instance.pk:
             self.fields['cla_asentamiento'].queryset = self.instance.codig_postal.cla_asentamiento_set.order_by('name')
 
+
+class formulario_editar_usuario(ModelForm):
+
+    class Meta:
+        model = cat_usuario
+        fields = ['email', 'nom_usuario', 'apellido_paterno', 'apellido_materno']
+        widgets = {'email':TextInput(attrs={'placeholder':'Correo electrónico'}),
+                   'nom_usuario':TextInput(attrs={'placeholder':'Nombre(s)'}),
+                   'apellido_paterno':TextInput(attrs={'placeholder':'Apellido Paterno'}),
+        }
+
+    apellido_materno = CharField(max_length=50,
+                                       label='Apellido Materno',
+                                       required=False,
+                                       widget=TextInput(
+                                           attrs={'placeholder':'Apellido Materno'}))
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        try:
+            cat_usuario.objects.get(email=email)
+        except ObjectDoesNotExist:
+            return email
+        raise ValidationError('Ese correo ya está en uso.')
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.set_password(self.cleaned_data["contrasena1"])
+        if commit:
+            usuario.is_active = False
+            usuario.save()
+        return usuario
+
+from .models import perfil_vecino
+from django.forms import inlineformset_factory
+#https://stackoverflow.com/questions/980405/raw-id-fields-for-modelforms
+class formulario_direcciones_usuario(ModelForm):
+    class Meta:
+        model = perfil_vecino
+        exclude = ()

@@ -32,7 +32,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"> {{ user.nom_usuario }} </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'editar_usuario' %}"> {{ user.nom_usuario }} </a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a></li>
             {% else %}
                 <!--<li class="nav-item pt-1"><button type="button" class="btn btn-secondary mr-sm-2">Iniciar Sesion</button></li>
