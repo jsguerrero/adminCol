@@ -51,11 +51,12 @@ def registro(request):
             usuario = form_usuario.save()
             direccion.cla_usuario_id = usuario.id
             direccion.activo = False
+            direccion.cla_codigo_postal_id = cat_codigo_postal.objects.get(cla_codigo_postal = form_direccion.cleaned_data['codigo_postal'])
             direccion.save()
             email = form_usuario.cleaned_data['email']
             sem = hashlib.sha1(str(random.random()).encode("utf-8")).hexdigest()[:5]
             llave_activacion = hashlib.sha1((sem+email).lower().encode("utf-8")).hexdigest()
-            expiracion_llave = datetime.datetime.today() + datetime.timedelta(days=2)
+            expiracion_llave = timezone.now() + timezone.timedelta(days=2)
             u = cat_usuario.objects.get(email=email)
             perfil = perfil_usuario(cla_usuario=u, llave_activacion=llave_activacion, expiracion_llave=expiracion_llave)
             perfil.save()
@@ -140,3 +141,4 @@ def editar_usuario(request):
     context.update(csrf(request))
 
     return render(request, 'registration/editar_usuario.html', context)
+
